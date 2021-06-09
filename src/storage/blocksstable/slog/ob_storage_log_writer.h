@@ -74,10 +74,10 @@ class ObStorageLogItem : public common::ObIBaseLogItem {
 };
 
 class ObStorageLogWriter : public common::ObBaseLogWriter {
-  public:
-  static const int64_t LOG_FILE_ALIGN_SIZE = 1 << common::OB_DIRECT_IO_ALIGN_BITS;
+public:
+  static const int64_t LOG_FILE_ALIGN_SIZE = 4 * 1024; // 4KB
   static const int64_t LOG_BUF_RESERVED_SIZE = 3 * LOG_FILE_ALIGN_SIZE;  // NOP + switch_log
-  static const int64_t LOG_ITEM_MAX_LENGTH = 32 << 20;                   // 32MB
+  static const int64_t LOG_ITEM_MAX_LENGTH = 32 << 20; // 32MB
 
   ObStorageLogWriter();
   virtual ~ObStorageLogWriter();
@@ -105,7 +105,7 @@ class ObStorageLogWriter : public common::ObBaseLogWriter {
     ATOMIC_STORE(&is_ok_, ok);
   }
 
-  private:
+private:
   static const int64_t FLUSH_THREAD_IDLE_INTERVAL_US = 10 * 1000;  // 10ms
   static const int64_t MAX_FLUSH_WAIT_TIME_MS = 60 * 1000;         // 60s
 
@@ -166,7 +166,7 @@ class ObStorageLogWriter : public common::ObBaseLogWriter {
     int64_t len_;
   };
 
-  private:
+private:
   int prepare_log_buffers(const int64_t count, const int64_t log_buf_size);
   void destroy_log_buffers();
   int prepare_log_items(const int64_t count);
@@ -194,7 +194,6 @@ class ObStorageLogWriter : public common::ObBaseLogWriter {
       common::ObIBaseLogItem** items, const int64_t item_cnt, int64_t& sync_idx, const int64_t cur_idx);
   int aggregate_logs_to_buffer(common::ObIBaseLogItem** items, const int64_t item_cnt, const int64_t sync_idx,
       const int64_t cur_idx, char*& write_buf, int64_t& write_len);
-  ;
 
   int advance_log_items(common::ObIBaseLogItem** items, const int64_t item_cnt, const int64_t cur_idx);
   int advance_single_item(const int64_t cur_file_id, ObStorageLogItem& log_item);
